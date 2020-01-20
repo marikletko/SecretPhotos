@@ -45,10 +45,7 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
                    self.photos = image
                } catch {}
         
-        
-        
-        
-        
+
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(self.handleGesture(gesture:))) // СВАЙП ВВЕРХ ДЛЯ ТОГО ЧТОБЫ ВЫЙТИ ИЗ ФОТКИ
         swipeUp.direction = .up
         self.view.addGestureRecognizer(swipeUp)
@@ -154,66 +151,7 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     
     
-    @objc func saveText(sender:UIButton!) {
-        
-         let position = self.myCollectionView.contentOffset.x / viewWidth
-        imageProperties[Int(position)].text = stringSaved
-      //  imageProperties[Int(position)].textPos = textFieldOrigin
-          UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
-        sender.removeFromSuperview()
-        myCollectionView.reloadData()
-    }
-    
-    // в чем отличие addSubview от insertSubview
-    @objc func addSign(sender: UIButton!) {
-        self.imageProperties[sender.tag].text = ""
-          UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
-        myCollectionView.reloadData()
-              }
-    
-    @objc func deleteButton(sender: UIButton!) {
-         let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
-        let alert = UIAlertController(title: "Delete image", message: "Are u sure?", preferredStyle: .actionSheet)
-                      let okAction = UIAlertAction(title: "YES", style: .default , handler: { action in
-                        self.imageProperties.remove(at: Int(position))
-                        
-                        queue.async {
-                        UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
-                                     }
-                  
-                        let context = PersistenceServce.context
-                        context.delete(self.photos[Int(position)])
-                        PersistenceServce.saveContext()
-                        self.photos.remove(at:Int(position))
-                        self.myCollectionView.reloadData()
-                        
-                        
-                      })
-                      let noAction = UIAlertAction(title: "NO", style: .default, handler: { action in
-                        //
-                      })
-                      alert.addAction(okAction)
-                      alert.addAction(noAction)
-                      self.present(alert,animated:true, completion: nil)
-           }
-    // currentIndex создать
-    
-    @objc func loveButton(sender: UIButton!) {
-      
-            let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
-        if sender.currentImage == UIImage(named:"heart") {
-            sender.setImage(UIImage(named:"heartTwo"), for: .normal)
-            self.imageProperties[Int(position)].loves = true
-        } else {
-            sender.setImage(UIImage(named:"heart"), for: .normal)
-            self.imageProperties[Int(position)].loves = false
-        }
-        
-        
-        queue.async{
-     UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
-                  }//СПРОСИТЬ СВЕРХУ
-       }
+ 
     
     // КОСТЫЛЬ сверху
     
@@ -254,8 +192,6 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
   
 extension ImagePreviewVC:CustomTextFieldDelegate {
     func callback() {
-   
-       
  let position = self.myCollectionView.contentOffset.x / viewWidth
      imageProperties[Int(position)].text = nil
      UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
@@ -264,3 +200,65 @@ extension ImagePreviewVC:CustomTextFieldDelegate {
 }
 
 
+private extension ImagePreviewVC {
+    @objc func saveText(sender:UIButton!) {
+         
+          let position = self.myCollectionView.contentOffset.x / viewWidth
+         imageProperties[Int(position)].text = stringSaved
+       //  imageProperties[Int(position)].textPos = textFieldOrigin
+           UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
+         sender.removeFromSuperview()
+         myCollectionView.reloadData()
+     }
+     
+     // в чем отличие addSubview от insertSubview
+     @objc func addSign(sender: UIButton!) {
+         self.imageProperties[sender.tag].text = ""
+           UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
+         myCollectionView.reloadData()
+               }
+     
+     @objc func deleteButton(sender: UIButton!) {
+          let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
+         let alert = UIAlertController(title: "Delete image", message: "Are u sure?", preferredStyle: .actionSheet)
+                       let okAction = UIAlertAction(title: "YES", style: .default , handler: { action in
+                         self.imageProperties.remove(at: Int(position))
+                         
+                         queue.async {
+                         UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
+                                      }
+                   
+                         let context = PersistenceServce.context
+                         context.delete(self.photos[Int(position)])
+                         PersistenceServce.saveContext()
+                         self.photos.remove(at:Int(position))
+                         self.myCollectionView.reloadData()
+                         
+                         
+                       })
+                       let noAction = UIAlertAction(title: "NO", style: .default, handler: { action in
+                         //
+                       })
+                       alert.addAction(okAction)
+                       alert.addAction(noAction)
+                       self.present(alert,animated:true, completion: nil)
+            }
+     // currentIndex создать
+     
+     @objc func loveButton(sender: UIButton!) {
+       
+             let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
+         if sender.currentImage == UIImage(named:"heart") {
+             sender.setImage(UIImage(named:"heartTwo"), for: .normal)
+             self.imageProperties[Int(position)].loves = true
+         } else {
+             sender.setImage(UIImage(named:"heart"), for: .normal)
+             self.imageProperties[Int(position)].loves = false
+         }
+         
+         
+         queue.async{
+      UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
+                   }//СПРОСИТЬ СВЕРХУ
+        }
+}
