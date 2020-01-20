@@ -22,10 +22,10 @@
 		ECAA3CEA23C1FDB2001D021C /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA3CE423C1FDB2001D021C /* PasswordView.swift */; };
 		ECAA3CEE23C20135001D021C /* ImagesCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA3CED23C20135001D021C /* ImagesCollectionViewController.swift */; };
 		ECAA3CF023C242BD001D021C /* ImagePreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA3CEF23C242BD001D021C /* ImagePreviewVC.swift */; };
+		ECF2000023C8C62F00A6BD44 /* Photos+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFFE23C8C62F00A6BD44 /* Photos+CoreDataClass.swift */; };
+		ECF2000123C8C62F00A6BD44 /* Photos+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFFF23C8C62F00A6BD44 /* Photos+CoreDataProperties.swift */; };
 		ECF2FFF323C8C1FE00A6BD44 /* SecretPhotosModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFF123C8C1FE00A6BD44 /* SecretPhotosModel.xcdatamodeld */; };
 		ECF2FFF923C8C2E800A6BD44 /* PersistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFF823C8C2E800A6BD44 /* PersistanceService.swift */; };
-		ECF2FFFC23C8C34E00A6BD44 /* Entity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFFA23C8C34E00A6BD44 /* Entity+CoreDataClass.swift */; };
-		ECF2FFFD23C8C34E00A6BD44 /* Entity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF2FFFB23C8C34E00A6BD44 /* Entity+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,8 +48,8 @@
 		ECAA3CEF23C242BD001D021C /* ImagePreviewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewVC.swift; sourceTree = "<group>"; };
 		ECF2FFF223C8C1FE00A6BD44 /* SecretPhotosModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SecretPhotosModel.xcdatamodel; sourceTree = "<group>"; };
 		ECF2FFF823C8C2E800A6BD44 /* PersistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceService.swift; sourceTree = "<group>"; };
-		ECF2FFFA23C8C34E00A6BD44 /* Entity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ECF2FFFB23C8C34E00A6BD44 /* Entity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ECF2FFFE23C8C62F00A6BD44 /* Photos+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photos+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ECF2FFFF23C8C62F00A6BD44 /* Photos+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photos+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +66,8 @@
 		ECAA3CBF23C1FC36001D021C = {
 			isa = PBXGroup;
 			children = (
-				ECF2FFFA23C8C34E00A6BD44 /* Entity+CoreDataClass.swift */,
-				ECF2FFFB23C8C34E00A6BD44 /* Entity+CoreDataProperties.swift */,
+				ECF2FFFE23C8C62F00A6BD44 /* Photos+CoreDataClass.swift */,
+				ECF2FFFF23C8C62F00A6BD44 /* Photos+CoreDataProperties.swift */,
 				ECAA3CCA23C1FC36001D021C /* SecretPhotos */,
 				ECAA3CC923C1FC36001D021C /* Products */,
 			);
@@ -178,20 +178,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECF2FFFD23C8C34E00A6BD44 /* Entity+CoreDataProperties.swift in Sources */,
 				ECAA3CE723C1FDB2001D021C /* CodableImages.swift in Sources */,
 				ECAA3CF023C242BD001D021C /* ImagePreviewVC.swift in Sources */,
 				ECF2FFF323C8C1FE00A6BD44 /* SecretPhotosModel.xcdatamodeld in Sources */,
 				EC86386C23C76FFC00543CE0 /* ImageCell.swift in Sources */,
 				ECAA3CEE23C20135001D021C /* ImagesCollectionViewController.swift in Sources */,
 				ECF2FFF923C8C2E800A6BD44 /* PersistanceService.swift in Sources */,
+				ECF2000023C8C62F00A6BD44 /* Photos+CoreDataClass.swift in Sources */,
 				ECAA3CE823C1FDB2001D021C /* Extensions.swift in Sources */,
 				ECAA3CD023C1FC36001D021C /* LogInViewController.swift in Sources */,
 				ECAA3CEA23C1FDB2001D021C /* PasswordView.swift in Sources */,
 				ECAA3CCC23C1FC36001D021C /* AppDelegate.swift in Sources */,
+				ECF2000123C8C62F00A6BD44 /* Photos+CoreDataProperties.swift in Sources */,
 				ECAA3CCE23C1FC36001D021C /* SceneDelegate.swift in Sources */,
 				ECAA3CE923C1FDB2001D021C /* ImageZoomView.swift in Sources */,
-				ECF2FFFC23C8C34E00A6BD44 /* Entity+CoreDataClass.swift in Sources */,
 				ECAA3CE623C1FDB2001D021C /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

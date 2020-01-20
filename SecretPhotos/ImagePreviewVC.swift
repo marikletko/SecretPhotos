@@ -1,19 +1,20 @@
 import UIKit
+import CoreData
 
-class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout  {
+
+
+class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     
     var myCollectionView: UICollectionView!
     var passedContentOffset = IndexPath()
-     var imageArr:[BaseElement] = UserDefaults.standard.value([BaseElement].self, forKey: "photos") ?? []
-    var arrayofBottomViews:[UIView] = []
-     var bottomHidden:Bool = false
-    
+    var stringSaved: String = ""
+    var bottomHidden:Bool = false
+    var imageProperties:[ImageProperties] = UserDefaults.standard.value([ImageProperties].self, forKey: "ImageProperties") ?? []
     var addSignBool:Bool = false
     // я пока хз как без этогo
-    
-    
-     var textFieldOrigin : CGPoint = CGPoint(x: 0, y: 0)
-    
+    var photos = [Photos]()
+    var textFieldOrigin : CGPoint = CGPoint(x: 0, y: 0)
     
     
     @objc func handleGesture(gesture: UISwipeGestureRecognizer) -> Void {
@@ -35,6 +36,15 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+    
+        let fetchRequest: NSFetchRequest<Photos> = Photos.fetchRequest()
+               
+               do {
+                   let image = try PersistenceServce.context.fetch(fetchRequest)
+                   self.photos = image
+               } catch {}
+        
         
         
         
@@ -61,7 +71,7 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
         myCollectionView.dataSource=self
         myCollectionView.register(ImagePreviewFullViewCell.self, forCellWithReuseIdentifier: "Cell")
         myCollectionView.isPagingEnabled = true
-        
+
         DispatchQueue.main.async {
             // ЖЕСТЬ
             self.myCollectionView.scrollToItem(at: self.passedContentOffset, at: .left, animated: true)
@@ -73,19 +83,27 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArr.count
+        return photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImagePreviewFullViewCell
         
-        cell.scrollImage.display(image: imageArr[indexPath.row].image!)
+        imageProperties = UserDefaults.standard.value([ImageProperties].self, forKey: "ImageProperties") ?? []
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImagePreviewFullViewCell
+        cell.signViewTextField.delegates = self
+        let dataImage = photos[indexPath.row].photos
+        let image = UIImage(data: dataImage!)
+        
+        cell.scrollImage.display(image: image!)
        
-        if imageArr[indexPath.row].loves == true {
+        if imageProperties[indexPath.row].loves == true {
             cell.lovesView.setImage(UIImage(named: "heartTwo"), for: .normal)
         } else {
             cell.lovesView.setImage(UIImage(named: "heart"), for: .normal)
         }
+        
+        // здесь надо создать кнопку(взять из ImageCell) для сохранения текста и добавить ее таргет
         
         cell.lovesView.addTarget(self, action: #selector(loveButton), for: .touchUpInside)
         
@@ -94,7 +112,7 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
          cell.deleteImageView.addTarget(self, action: #selector(deleteButton), for: .touchUpInside)
         
         cell.signView.addTarget(self, action: #selector(addSign), for: .touchUpInside)
-        
+        cell.signView.tag = indexPath.row
         
         if(bottomHidden == true) {
             cell.bottomView.isHidden = true
@@ -102,55 +120,73 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
         } else {
             cell.bottomView.isHidden = false
         }
-
-        if(addSignBool == true && imageArr[indexPath.row].text?.0 == false) {
-        let gesture = customTextField(target: self, action: #selector(moveFunc(pan:)))
-        gesture.custom = cell.signViewTextField
-        gesture.custom?.addGestureRecognizer(gesture)
-        gesture.custom?.isUserInteractionEnabled = true
-        cell.addSubview(gesture.custom!)
-        addSignBool = false
-        } else if(imageArr[indexPath.row].text?.0 == true){
-            let gesture = customTextField(target: self, action: #selector(moveFunc(pan:)))
-                   gesture.custom = cell.signViewTextField
-                   gesture.custom?.addGestureRecognizer(gesture)
-                   gesture.custom?.isUserInteractionEnabled = true
-            gesture.custom?.text = imageArr[indexPath.row].text?.1
-                   cell.addSubview(gesture.custom!)
-                   addSignBool = false
+        
+     //   cell.signViewTextField.delegate = self
+        cell.signViewTextField.addTarget(self, action: #selector(fieldChanged(textfieldChange:)), for: .editingChanged)
+        cell.signViewTextField.addTarget(self, action: #selector(fieldDidBeginEditing(textfieldBeginEditing:)), for: .editingDidBegin) // xeph9
+     //   cell.signViewTextField.addTarget(self, action: #selector(fieldDidBeginEditing(textfieldBeginEditing:)), for: .editingDidBegin)
+        cell.signViewTextField.tag = indexPath.row
+     //  cell.signViewTextField.frame.origin = imageProperties[indexPath.row].textPos!
+        if(imageProperties[indexPath.row].text != nil) {
+        cell.signViewTextField.text = imageProperties[indexPath.row].text
+        cell.self.addSubview(cell.signViewTextField)
+        } else {
+            cell.signViewTextField.removeFromSuperview()
         }
+    
         return cell
     }
     
-    @objc func moveFunc(pan: customTextField) {
-        var loc = pan.location(in: self.view)
-        pan.custom?.center = loc
-               }
+    
+    @objc func fieldChanged(textfieldChange: UITextField){
+        stringSaved = textfieldChange.text!
+    }
+    
+    @objc func fieldDidBeginEditing(textfieldBeginEditing: UITextField) {
+     //   textFieldOrigin = textfieldBeginEditing.frame.origin
+        let button = UIButton()
+        let indexPath = IndexPath(item: textfieldBeginEditing.tag, section: 0)
+        button.frame = CGRect(x: 300, y: 600, width: 50, height: 50)
+        button.backgroundColor = .blue
+        button.addTarget(self, action: #selector(saveText), for: .touchUpInside)
+        myCollectionView.cellForItem(at: indexPath)?.addSubview(button)
+    }
     
     
+    
+    @objc func saveText(sender:UIButton!) {
+        
+         let position = self.myCollectionView.contentOffset.x / viewWidth
+        imageProperties[Int(position)].text = stringSaved
+      //  imageProperties[Int(position)].textPos = textFieldOrigin
+          UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
+        sender.removeFromSuperview()
+        myCollectionView.reloadData()
+    }
     
     // в чем отличие addSubview от insertSubview
     @objc func addSign(sender: UIButton!) {
-        self.myCollectionView.reloadData()
-         if (!addSignBool) {
-                     addSignBool = true
-                      
-                  } else {
-                     addSignBool = false
-                  }
+        self.imageProperties[sender.tag].text = ""
+          UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
+        myCollectionView.reloadData()
               }
     
     @objc func deleteButton(sender: UIButton!) {
          let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
         let alert = UIAlertController(title: "Delete image", message: "Are u sure?", preferredStyle: .actionSheet)
                       let okAction = UIAlertAction(title: "YES", style: .default , handler: { action in
-                        self.imageArr.remove(at: Int(position))
+                        self.imageProperties.remove(at: Int(position))
                         
-                        queue.async{ //?
-                        UserDefaults.standard.set(encodable: self.imageArr, forKey: "photos")
+                        queue.async {
+                        UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
                                      }
-                        
+                  
+                        let context = PersistenceServce.context
+                        context.delete(self.photos[Int(position)])
+                        PersistenceServce.saveContext()
+                        self.photos.remove(at:Int(position))
                         self.myCollectionView.reloadData()
+                        
                         
                       })
                       let noAction = UIAlertAction(title: "NO", style: .default, handler: { action in
@@ -167,20 +203,18 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
             let position = self.myCollectionView.contentOffset.x / viewWidth // костыли
         if sender.currentImage == UIImage(named:"heart") {
             sender.setImage(UIImage(named:"heartTwo"), for: .normal)
-            self.imageArr[Int(position)].loves = true
+            self.imageProperties[Int(position)].loves = true
         } else {
             sender.setImage(UIImage(named:"heart"), for: .normal)
-            self.imageArr[Int(position)].loves = false
+            self.imageProperties[Int(position)].loves = false
         }
         
         
         queue.async{
-     UserDefaults.standard.set(encodable: self.imageArr, forKey: "photos")
-                  }
-    //СПРОСИТЬ СВЕРХУ
+     UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
+                  }//СПРОСИТЬ СВЕРХУ
        }
     
-
     // КОСТЫЛЬ сверху
     
     override func viewWillLayoutSubviews() {
@@ -218,7 +252,15 @@ class ImagePreviewVC: UIViewController, UICollectionViewDelegate, UICollectionVi
     
 }
   
-class customTextField: UIPanGestureRecognizer {
-    var custom: UITextField?
-   // var bottomView: UIView?
+extension ImagePreviewVC:CustomTextFieldDelegate {
+    func callback() {
+   
+       
+ let position = self.myCollectionView.contentOffset.x / viewWidth
+     imageProperties[Int(position)].text = nil
+     UserDefaults.standard.set(encodable:self.imageProperties, forKey: "ImageProperties")
+     myCollectionView.reloadData()
+   }
 }
+
+

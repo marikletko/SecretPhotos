@@ -1,5 +1,5 @@
 //
-//  Entity+CoreDataProperties.swift
+//  Photos+CoreDataProperties.swift
 //  SecretPhotos
 //
 //  Created by Kirill Letko on 1/10/20.
@@ -11,10 +11,10 @@ import Foundation
 import CoreData
 
 
-extension Entity {
+extension Photos {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Entity> {
-        return NSFetchRequest<Entity>(entityName: "Entity")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Photos> {
+        return NSFetchRequest<Photos>(entityName: "Photos")
     }
 
     @NSManaged public var photos: Data?

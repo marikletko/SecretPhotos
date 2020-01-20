@@ -19,7 +19,7 @@ class LogInViewController: UIViewController {
                 guard let controller = self.storyboard?.instantiateViewController(withIdentifier: "ImagesCollectionViewController") as? ImagesCollectionViewController else { return }
                 self.navigationController?.pushViewController(controller, animated: true)
             } else {
-                let alert = UIAlertController(title: "Delete image", message: "Are u sure?", preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: "Wrongpass", message: "Are u sure?", preferredStyle: .actionSheet)
                 let okAction = UIAlertAction(title: "YES", style: .default , handler:nil)
                 alert.addAction(okAction)
                 self.present(alert,animated:true, completion: nil)

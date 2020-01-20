@@ -1,35 +1,25 @@
 import Foundation
 import UIKit
 
-class BaseElement: Codable {
-    
-    var image :UIImage?
+class ImageProperties: Codable {
     var loves :Bool?
-    var text:(Bool,String)? // сделать просто String
+    var text: String?
+    var textPos:CGPoint?
     
-    private enum CodingKeys: String, CodingKey { // набор ключей под которыми будут упаковываться проперти
-        case image
+    private enum CodingKeys: String, CodingKey {
         case loves
+        case text
+        case textPos
     }
     
     init() {}
 
-    required init(from decoder: Decoder) throws { //обязательная инициализация //процедура сборки объекта из даты
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let data = try container.decode(Data.self, forKey: .image)
-        image = UIImage(data: data)
-        loves = try container.decode(Bool.self, forKey: .loves)
+        text = try container.decodeIfPresent(String.self, forKey: .text)
+        loves = try container.decodeIfPresent(Bool.self, forKey: .loves)
+        textPos = try container.decodeIfPresent(CGPoint.self, forKey: .textPos)
     }
     
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if let photo = image {
-            guard let data = photo.jpegData(compressionQuality: 1) else {
-                return
-            }
-            try container.encode(data, forKey: CodingKeys.image)
-            try container.encode(self.loves, forKey: CodingKeys.loves)
-        }
-    }
+
 }

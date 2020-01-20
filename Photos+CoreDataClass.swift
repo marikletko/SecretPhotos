@@ -1,5 +1,5 @@
 //
-//  Entity+CoreDataClass.swift
+//  Photos+CoreDataClass.swift
 //  SecretPhotos
 //
 //  Created by Kirill Letko on 1/10/20.
@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-@objc(Entity)
-public class Entity: NSManagedObject {
+@objc(Photos)
+public class Photos: NSManagedObject {
 
 }

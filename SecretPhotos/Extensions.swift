@@ -9,23 +9,28 @@
 import Foundation
 import UIKit
 
-extension ImagesCollectionViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension ImagesCollectionViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate, UICollectionViewDelegateFlowLayout {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             
-            let obj = BaseElement()
-            obj.image = pickedImage
+            let dataImage = pickedImage.jpegData(compressionQuality: 1)
+            
+            let image = Photos(context: PersistenceServce.context)
+            image.photos = dataImage
+            PersistenceServce.saveContext()
+            photos.append(image)
+             
+            let obj = ImageProperties()
+     
             obj.loves = false
-            obj.text = (false , "")
-                
-            imageArr.append(obj)
-            UserDefaults.standard.set(encodable: imageArr, forKey: "photos")
-            //   UserDefaults.standard.set(encodable: names, forKey: "name")
-         
-            self.imagePicker.dismiss(animated: true) {
-                
-            self.collectionView.reloadData() // опять? зачем?
+            obj.text = nil
+            obj.textPos = CGPoint(x:200,y:200)
+            
+            imageProperties.append(obj)
+            UserDefaults.standard.set(encodable: self.imageProperties, forKey: "ImageProperties")
 
+            self.imagePicker.dismiss(animated: true) {
+            self.collectionView.reloadData() // опять? зачем?
             }
         }
     }
@@ -89,24 +94,8 @@ extension UIScrollView {
 
 class PhotoItemCell: UICollectionViewCell {
     
-    var img = UIImageView()
+    @IBOutlet var img: UIImageView!
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        img.contentMode = .scaleAspectFill
-        img.clipsToBounds=true
-        self.addSubview(img)
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        img.frame = self.bounds
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 

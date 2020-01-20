@@ -1,12 +1,13 @@
 import UIKit
-
+import CoreData
 private let reuseIdentifier = "Cell"
 
 class ImagesCollectionViewController: UICollectionViewController {
     
+    var photos = [Photos]()
     
     let imagePicker = UIImagePickerController()
-    var imageArr:[BaseElement] = UserDefaults.standard.value([BaseElement].self, forKey: "photos") ?? []
+    var imageProperties:[ImageProperties] = UserDefaults.standard.value([ImageProperties].self, forKey: "ImageProperties") ?? []
     
     
     @IBAction func lala(_ sender: UIButton) {
@@ -16,29 +17,75 @@ class ImagesCollectionViewController: UICollectionViewController {
                {
                    key in defaults.removeObject(forKey: key)
            }
+        //UserDefaults.standard.set(nil, forKey: "ImageProperties")
+       deleteAllRecords(in: "Photos")
+    
+    }
+    
+    func deleteAllRecords(in entity : String) // entity = Your_Entity_Name
+    {
+
+        let context = PersistenceServce.context
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+        if #available(iOS 9, *)
+        {
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+            do
+            {
+                try context.execute(deleteRequest)
+                try context.save()
+            }
+            catch
+            {
+                print("There was an error:\(error)")
+            }
+        }
+        else
+        {
+            do{
+                let deleteRequest = try context.fetch(deleteFetch)
+                for anItem in deleteRequest {
+                    context.delete(anItem as! NSManagedObject)
+                }
+            }
+            catch
+            {
+                print("There was an error:\(error)")
+            }
+        }
+        PersistenceServce.saveContext() // Note:- Replace your savecontext here with CoreDataStack.saveContext()
     }
     
     @IBAction func addPhotoButton(_ sender: UIButton) {
-//   imageArr = UserDefaults.standard.value([BaseElement].self, forKey: "photos") ?? []
         pick()
     }
     
      override func viewWillAppear(_ animated: Bool) {
-    
-         
-               
-                 UserDefaults.standard.synchronize() //
-                          self.imageArr = UserDefaults.standard.value([BaseElement].self, forKey: "photos") ?? [] // чтобы фотка удалилась из мэйн коллекшн вью приходится еще раз считывать значения, это норм?
+              //   UserDefaults.standard.synchronize() //
+                     //     self.imageArr = UserDefaults.standard.value([BaseElement].self, forKey: "photos") ?? [] // чтобы фотка удалилась из мэйн коллекшн вью приходится еще раз считывать значения, это норм?
+        let fetchRequest: NSFetchRequest<Photos> = Photos.fetchRequest()
+        
+        do {
+            let image = try PersistenceServce.context.fetch(fetchRequest)
+            self.photos = image
+           self.collectionView.reloadData()
+        } catch {}
+        
+        
          self.collectionView.reloadData()
            
        }
        
        override func viewDidLoad() {
            super.viewDidLoad()
+        
+        print(imageProperties.count)
+    //
+        
            
            self.imagePicker.delegate = self
            
-           self.collectionView!.register(PhotoItemCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+         //  self.collectionView!.register(PhotoItemCell.self, forCellWithReuseIdentifier: reuseIdentifier)
            
            self.collectionView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
            
@@ -46,39 +93,31 @@ class ImagesCollectionViewController: UICollectionViewController {
     
   
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArr.count
+        return photos.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PhotoItemCell
-        cell.img.image = imageArr[indexPath.row].image!
+        let dataImage = photos[indexPath.row].photos
+        let image = UIImage(data: dataImage!)
+        cell.img.image = image
         return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc=ImagePreviewVC()
-        vc.imageArr = self.imageArr
+        vc.imageProperties = self.imageProperties
         vc.passedContentOffset = indexPath
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.width
-        
-        if DeviceInfo.Orientation.isPortrait {
-            return CGSize(width: width/4 - 1, height: width/4 - 1)
-        } else {
-            return CGSize(width: width/6 - 1, height: width/6 - 1)
-        }
-    }
+          let width = collectionView.frame.size.width/3
+          let height = width
+          return CGSize(width: width, height: height)
+      }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 1.0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 1.0
-    }
+
     
     func pick() {
           self.imagePicker.sourceType = .photoLibrary
